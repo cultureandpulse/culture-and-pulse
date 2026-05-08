@@ -1,72 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Culture & Pulse</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/14jm-TllzOtrlOJIteOqteYquXLwho5M4d4ESjRcGchg/gviz/tq?tqx=out:json";
 
-<div class="nav">
-  <div><strong>Culture & Pulse</strong></div>
-  <div>
-    <a href="index.html">Home</a>
-    <a href="sports.html">Sports</a>
-    <a href="did-you-know.html">Did You Know</a>
-    <a href="pulse-check.html">Pulse Check</a>
-    <a href="culture-drop.html">Culture Drop</a>
-  </div>
-</div>
+fetch(sheetURL)
+  .then(res => res.text())
+  .then(data => {
 
-<div class="section">
-  <div class="hero-card">
-    <div class="tag">FEATURE STORY</div>
-    <h1>Main Headline Goes Here</h1>
-    <p>Your ESPN-style hero story slot.</p>
-    <button class="primary">Read Story</button>
-    <button class="secondary">Watch Clip</button>
-  </div>
-</div>
+    const json = JSON.parse(data.substr(47).slice(0, -2));
+    const rows = json.table.rows;
 
-<div class="section">
-  <h2>Featured Stories</h2>
-  <div class="cards">
+    let html = "";
 
-    <a href="article.html">
-  <div class="card">
-    <img src="https://via.placeholder.com/400x200" />
-    <div class="tag">SPORTS</div>
-    <h3>WNBA Highlight</h3>
-  </div>
-</a>
+    rows.forEach(r => {
+      const title = r.c[1]?.v || "";
+      const category = r.c[2]?.v || "";
+      const excerpt = r.c[4]?.v || "";
+      const link = r.c[5]?.v || "#";
 
-    <a href="article.html">
-  <div class="card">
-    <img src="https://via.placeholder.com/400x200" />
-    <div class="tag">SPORTS</div>
-    <h3>WNBA Highlight</h3>
-  </div>
-</a>
+      html += `
+        <a href="${link}">
+          <div class="feed-item">
+            <strong>[${category}]</strong> ${title}
+            <br/>
+            <small>${excerpt}</small>
+          </div>
+        </a>
+      `;
+    });
 
-    <a href="article.html">
-  <div class="card">
-    <img src="https://via.placeholder.com/400x200" />
-    <div class="tag">SPORTS</div>
-    <h3>WNBA Highlight</h3>
-  </div>
-</a>
-
-  </div>
-</div>
-
-<div class="section">
-  <h2>Latest Drops 🔥</h2>
-
-  <div class="feed-item">📚 Did You Know: Historical sports moment</div>
-  <div class="feed-item">🎤 Pulse Check: Game of the week?</div>
-  <div class="feed-item">🏀 Sports Update: Standings shift</div>
-  <div class="feed-item">🎧 Culture Drop: Viral athlete moment</div>
-
-</div>
-
-</body>
-</html>
+    document.getElementById("feed").innerHTML = html;
+  })
+  .catch(err => {
+    document.getElementById("feed").innerHTML =
+      "<div class='feed-item'>Feed loading error — check sheet sharing settings</div>";
+  });
+</script>
