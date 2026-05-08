@@ -11,13 +11,14 @@ fetch(sheetURL)
     let html = "";
 
     rows.forEach(r => {
+
+      const id = r.c[0]?.v || "";        // ✅ NEW (IMPORTANT)
       const title = r.c[1]?.v || "";
       const category = r.c[2]?.v || "";
       const excerpt = r.c[4]?.v || "";
-      const link = r.c[5]?.v || "#";
 
       html += `
-        <a href="${link}">
+        <a href="article.html?id=${id}">
           <div class="feed-item">
             <strong>[${category}]</strong> ${title}
             <br/>
@@ -28,6 +29,7 @@ fetch(sheetURL)
     });
 
     document.getElementById("feed").innerHTML = html;
+
   })
   .catch(err => {
     document.getElementById("feed").innerHTML =
