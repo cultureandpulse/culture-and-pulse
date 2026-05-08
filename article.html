@@ -18,35 +18,63 @@
 </div>
 
 <div class="section">
-
-  <div class="card">
-    <div class="tag">SPORTS</div>
-
-    <h1>Main Article Headline Goes Here</h1>
-
-    <p>
-      This is your long-form storytelling space. This is where Culture & Pulse
-      starts feeling like a real media publication instead of just a feed.
-    </p>
-
-    <img src="https://via.placeholder.com/800x400" />
-
-    <p>
-      Paragraph 1 — You can write game breakdowns, historical context,
-      or cultural analysis here.
-    </p>
-
-    <p>
-      Paragraph 2 — Add deeper insight, quotes, or storytelling elements.
-    </p>
-
-    <p>
-      Paragraph 3 — Wrap it with your cultural or historical perspective.
-    </p>
-
-  </div>
-
+  <div id="article">Loading article...</div>
 </div>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/14jm-TllzOtrlOJIteOqteYquXLwho5M4d4ESjRcGchg/gviz/tq?tqx=out:json";
+
+// Get ID from URL (?id=wnba1)
+const params = new URLSearchParams(window.location.search);
+const articleId = params.get("id");
+
+fetch(sheetURL)
+  .then(res => res.text())
+  .then(data => {
+
+    const json = JSON.parse(data.substr(47).slice(0, -2));
+    const rows = json.table.rows;
+
+    let article = null;
+
+    rows.forEach(r => {
+      const id = r.c[0]?.v;
+
+      if (id === articleId) {
+        article = {
+          title: r.c[1]?.v,
+          category: r.c[2]?.v,
+          image: r.c[3]?.v,
+          excerpt: r.c[4]?.v
+        };
+      }
+    });
+
+    if (!article) {
+      document.getElementById("article").innerHTML =
+        "<div class='card'>Article not found.</div>";
+      return;
+    }
+
+    document.getElementById("article").innerHTML = `
+      <div class="card">
+
+        <div class="tag">${article.category}</div>
+
+        <h1>${article.title}</h1>
+
+        <img src="${article.image}" />
+
+        <p>${article.excerpt}</p>
+
+      </div>
+    `;
+  })
+  .catch(err => {
+    document.getElementById("article").innerHTML =
+      "<div class='card'>Error loading article.</div>";
+  });
+</script>
 
 </body>
 </html>
